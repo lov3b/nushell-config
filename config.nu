@@ -18,6 +18,8 @@ def get_current_git_ref [] {
 
 $env.PROMPT_COMMAND = {||
   let path = (pwd | str replace --all $nu.home-path "~")
+  let user = (whoami)
+  let host = (sys host).hostname
 
   let git_part = if (is_in_git_repo) {
     let ref = (get_current_git_ref)
@@ -26,7 +28,7 @@ $env.PROMPT_COMMAND = {||
     ""
   }
 
-  $"(ansi green)($path)(ansi reset)($git_part)"
+  $"(ansi cyan)($user)(ansi blue)@(ansi magenta)($host)(ansi reset) (ansi blue)::(ansi reset) (ansi green)($path)(ansi reset)($git_part)"
 }
 
 def json_f [file?: path] {
