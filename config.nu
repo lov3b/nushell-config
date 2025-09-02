@@ -86,3 +86,8 @@ if (sys host | get name) == "Darwin" {
         $env.PATH = [$brew_bin, ...$env.PATH]
     }
 }
+
+let cargo_dir = ($nu.home-path | path join .cargo bin)
+if ($cargo_dir | path exists) and (not ($env.PATH | any {|p| $p == $cargo_dir})) {
+      $env.PATH = $env.PATH | append $cargo_dir
+}
