@@ -19,7 +19,7 @@ def get_current_git_ref [] {
 $env.PROMPT_COMMAND = {||
   let path = (pwd | str replace --all $nu.home-path "~")
   let user = (whoami)
-  let host = (sys host).hostname
+  let host = (sys host).hostname | str replace -r '\.local$' ''
 
   let git_part = if (is_in_git_repo) {
     let ref = (get_current_git_ref)
