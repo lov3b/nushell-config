@@ -89,6 +89,11 @@ if (sys host | get name) == "Darwin" {
     }
 }
 
+let local_bin = $nu.home-path | path join .local bin
+if ($local_bin | path exists) and ($local_bin | path type | $in == "dir") {
+    $env.PATH = $env.PATH | append $local_bin
+}
+
 let cargo_dir = ($nu.home-path | path join .cargo bin)
 if ($cargo_dir | path exists) and (not ($env.PATH | any {|p| $p == $cargo_dir})) {
       $env.PATH = $env.PATH | append $cargo_dir
