@@ -77,6 +77,39 @@ def fix-lw [] {
     xattr -r -d com.apple.quarantine /Applications/LibreWolf.app
 }
 
+def activate-venv [venv_path = ".venv"] {
+    $env.VIRTUAL_ENV_PATH_ORIGINAL = $env.PATH
+    
+    # Determine the correct bin directory based on OS
+    let bin_dir = if $nu.os-info.name == "windows" {
+        $venv_path | path join 'Scripts'
+    } else {
+        $venv_path | path join 'bin'
+    }
+    
+    $env.PATH = ($env.PATH | prepend $bin_dir)
+    $env.VIRTUAL_ENV = ($venv_path | path expand)
+    $env.PYTHONHOME = null
+}
+
+def deactivate-venv [] {
+    # Restore original PATH if it was saved
+    if 'VIRTUAL_ENV_PATH_ORIGINAL' in $env {
+        $env.PATH = $env.VIRTUAL_ENV_PATH_ORIGINAL
+        $env.VIRTUAL_ENV_PATH_ORIGINAL = null
+    } else {
+        # Fallback: remove venv paths for both Windows and Unix
+        $env.PATH = ($env.PATH | where { |path| 
+            not (
+                ($path | str contains '.venv') and 
+                (($path | str ends-with 'Scripts') or ($path | str ends-with 'bin'))
+            )
+        })
+    }
+    
+    $env.VIRTUAL_ENV = null
+}
+
 if (sys host | get name) == "Darwin" {
     let brew_bin = if (uname | get machine) == "arm64" {
         "/opt/homebrew/bin"
