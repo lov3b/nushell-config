@@ -77,6 +77,22 @@ def fix-lw [] {
     xattr -r -d com.apple.quarantine /Applications/LibreWolf.app
 }
 
+def files [extension: string] {
+    # Ensure extension starts with a dot
+    let ext = if ($extension | str starts-with '.') {
+        $extension
+    } else {
+        $'\.($extension)'
+    }
+    
+    glob $"**/*($ext)"
+    | each { |file|
+        print $"# ($file)"
+        open $file | print
+        print ""
+    }
+}
+
 def activate-venv [venv_path = ".venv"] {
     $env.VIRTUAL_ENV_PATH_ORIGINAL = $env.PATH
     
