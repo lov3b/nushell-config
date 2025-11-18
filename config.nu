@@ -19,7 +19,7 @@ def get_current_git_ref [] {
 $env.PROMPT_COMMAND = {||
   let path = (pwd | str replace --all $nu.home-path "~")
   let user = (whoami)
-  let host = (sys host).hostname
+  let host = (sys host).hostname | str replace -r '\.local$' ''
 
   let git_part = if (is_in_git_repo) {
     let ref = (get_current_git_ref)
@@ -136,6 +136,11 @@ if (sys host | get name) == "Darwin" {
     if not ($env.PATH | any {|p| $p == $brew_bin }) {
         $env.PATH = [$brew_bin, ...$env.PATH]
     }
+}
+
+let local_bin = $nu.home-path | path join .local bin
+if ($local_bin | path exists) and ($local_bin | path type | $in == "dir") {
+    $env.PATH = $env.PATH | append $local_bin
 }
 
 let cargo_dir = ($nu.home-path | path join .cargo bin)
